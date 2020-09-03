@@ -1,0 +1,75 @@
+<template>
+  <div>
+    <form class="card comment-form">
+      <div class="card-block">
+        <textarea class="form-control" placeholder="Write a comment..." rows="3"></textarea>
+      </div>
+      <div class="card-footer">
+        <img src="http://i.imgur.com/Qr71crq.jpg" class="comment-author-img" />
+        <button class="btn btn-sm btn-primary">
+          Post Comment
+        </button>
+      </div>
+    </form>
+
+    <div class="card" v-for="comment in comments" :key="comment.id">
+      <div class="card-block">
+        <p class="card-text">
+          {{ comment.body }}
+        </p>
+      </div>
+      <div class="card-footer">
+        <nuxt-link
+          :to="{
+            name: 'profile',
+            params: {
+              username: comment.author.username,
+            },
+          }"
+          class="comment-author"
+        >
+          <img :src="comment.author.image" class="comment-author-img" />
+        </nuxt-link>
+        &nbsp;
+        <nuxt-link
+          :to="{
+            name: 'profile',
+            params: {
+              username: comment.author.username,
+            },
+          }"
+          class="comment-author"
+        >
+          {{ comment.author.username }}
+        </nuxt-link>
+        <span class="date-posted">{{ comment.createdAt | formatDate('MMM DD, YYYY') }}</span>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import { getComments } from '@/api/article'
+
+export default {
+  name: 'ArticleComment',
+  data() {
+    return {
+      comments: [], // 评论列表
+    }
+  },
+  props: {
+    article: {
+      type: Object,
+      required: true,
+    },
+  },
+  async mounted() {
+    // 评论无需 seo，只在客户端渲染
+    const {
+      data: { comments },
+    } = await getComments(this.article.slug)
+    this.comments = comments
+  },
+}
+</script>
