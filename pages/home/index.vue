@@ -25,8 +25,9 @@
                       tab: 'your_feed',
                     },
                   }"
-                  >Your Feed</nuxt-link
                 >
+                  Your Feed
+                </nuxt-link>
               </li>
               <li class="nav-item">
                 <nuxt-link
@@ -38,8 +39,9 @@
                   :to="{
                     name: 'home',
                   }"
-                  >Global Feed</nuxt-link
                 >
+                  Global Feed
+                </nuxt-link>
               </li>
               <li v-if="tag" class="nav-item">
                 <nuxt-link
@@ -55,89 +57,20 @@
                       tag,
                     },
                   }"
-                  >#{{ tag }}</nuxt-link
                 >
+                  #{{ tag }}
+                </nuxt-link>
               </li>
             </ul>
           </div>
-
-          <div class="article-preview" v-for="article in articles" :key="article.slug">
-            <div class="article-meta">
-              <nuxt-link
-                :to="{
-                  name: 'profile',
-                  params: {
-                    username: article.author.username,
-                  },
-                }"
-                ><img :src="article.author.image"
-              /></nuxt-link>
-              <div class="info">
-                <nuxt-link
-                  class="author"
-                  :to="{
-                    name: 'profile',
-                    params: {
-                      username: article.author.username,
-                    },
-                  }"
-                  >{{ article.author.username }}</nuxt-link
-                >
-                <span class="date">{{ article.createdAt | formatDate('MMM DD, YYYY') }}</span>
-              </div>
-              <button
-                class="btn btn-outline-primary btn-sm pull-xs-right"
-                :class="{
-                  active: article.favorited,
-                }"
-                @click="onFavorite(article)"
-              >
-                <i class="ion-heart"></i> {{ article.favoritesCount }}
-              </button>
-            </div>
-            <nuxt-link
-              :to="{
-                name: 'article',
-                params: {
-                  slug: article.slug,
-                },
-              }"
-              class="preview-link"
-            >
-              <h1>{{ article.title }}</h1>
-              <p>{{ article.description }}</p>
-              <span>Read more...</span>
-            </nuxt-link>
-          </div>
-
-          <!-- 分页 -->
-          <nav>
-            <ul class="pagination">
-              <li
-                data-test="page-link-1"
-                :class="{
-                  'page-item': true,
-                  active: item === page,
-                }"
-                v-for="item in totalPage"
-                :key="item"
-              >
-                <nuxt-link
-                  :to="{
-                    name: 'home',
-                    query: {
-                      page: item,
-                      tab: $route.query.tab,
-                      tag: $route.query.tag,
-                    },
-                  }"
-                  class="page-link"
-                  >{{ item }}</nuxt-link
-                >
-              </li>
-            </ul>
-          </nav>
-          <!-- 分页 -->
+          
+          <template v-if="articles.length === 0">
+            <div class="article-preview">No articles are here... yet.</div>
+          </template>
+          <template v-else>
+            <article-preview v-for="article in articles" :key="article.slug" :article="article" />
+            <pagination :page="page" :total="total" />
+          </template>
         </div>
 
         <div class="col-md-3">
@@ -168,15 +101,22 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import { getArticles, getYourFeedArticles, addFavorite, deleteFavorite } from '@/api/article'
 import { getTags } from '@/api/tag'
-import { mapState } from 'vuex'
+import ArticlePreview from '@/components/article-preview'
+import Pagination from '@/components/pagination'
+
+const limit = 20
 
 export default {
   name: 'HomeIndex',
+  components: {
+    ArticlePreview,
+    Pagination,
+  },
   async asyncData({ query }) {
     const page = Number.parseInt(query.page || 1)
-    const limit = 20
     const tab = query.tab || 'global_feed'
     const tag = query.tag
     const loadArticles = tab === 'your_feed' ? getYourFeedArticles : getArticles
@@ -195,11 +135,11 @@ export default {
       }),
       getTags(),
     ])
+    const total = Math.ceil(articlesCount / limit)
     return {
-      articles, // 文章列表
-      articlesCount, // 文章总数
-      limit, // 每页大小
+      total, // 总页数
       page, // 页号
+      articles, // 文章列表
       tags, // 标签列表
       tab, // 选项卡
       tag, // 标签
@@ -207,27 +147,8 @@ export default {
   },
   computed: {
     ...mapState(['user']),
-    totalPage() {
-      // 总页数
-      return Math.ceil(this.articlesCount / this.limit)
-    },
   },
   watchQuery: ['page', 'tag', 'tab'], // 监听 query 变化调用asyncData
-  methods: {
-    async onFavorite(article) {
-      if (article.favorited) {
-        // 取消点赞
-        await deleteFavorite(article.slug)
-        article.favorited = false
-        article.favoritesCount -= 1
-      } else {
-        // 添加点赞
-        await addFavorite(article.slug)
-        article.favorited = true
-        article.favoritesCount += 1
-      }
-    }
-  }
 }
 </script>
 

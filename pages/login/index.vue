@@ -81,13 +81,15 @@ export default {
       try {
         // 提交表单请求登录
         const request = this.isLogin ? login : register
-        const { data } = await request({
+        const {
+          data: { user },
+        } = await request({
           user: this.user,
         })
         // 保存用户的登录状态
-        this.$store.commit('setUser', data.user)
+        this.$store.commit('setUser', user)
         // 为了防止刷新页面数据丢失，我们需要把数据持久化
-        Cookie.set('user', data.user)
+        Cookie.set('user', user)
         // 跳转到首页
         this.$router.push('/')
       } catch (e) {
