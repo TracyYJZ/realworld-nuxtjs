@@ -52,5 +52,5 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
           script: |
-            cd /realworld-nuxtjs
+            cd ./realworld-nuxtjs
             sh deploy.sh
