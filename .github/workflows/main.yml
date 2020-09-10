@@ -45,17 +45,18 @@ jobs:
 
       # 部署到服务器
       - name: Deploy
-        uses: appleboy/ssh-action@master
+        uses: cross-the-world/ssh-pipeline@master
+        env:
+          WELCOME: 'ssh pipeline'
         with:
           host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
+          user: ${{ secrets.USERNAME }}
+          pass: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
+          connect_timeout: 10s
           script: |
-            # cd ./realworld-nuxtjs
-            # wget https://github.com/jeffacode/realworld-nuxtjs/releases/latest/download/release.tgz -O release.tgz
-            # tar zxvf release.tgz
-            # ../.nvm/versions/node/v12.18.3/bin/npm install --registry=https://registry.npm.taobao.org
-            # ../.nvm/versions/node/v12.18.3/bin/pm2 reload pm2.config.json
-            which npm
-            which pm2
+            cd ./realworld-nuxtjs
+            wget https://github.com/jeffacode/realworld-nuxtjs/releases/latest/download/release.tgz -O release.tgz
+            tar zxvf release.tgz
+            npm install --registry=https://registry.npm.taobao.org
+            pm2 reload pm2.config.json
