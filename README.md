@@ -2,6 +2,4 @@
 
 · 技术栈：Vue + Nuxt
 
-· 使用 Vercel 简易部署
-
-· 基于 RealWorld：https://github.com/gothinkster/realworld
+· 基于 RealWorld：https://github.com/TracyYJZ/realworld-nuxtjs

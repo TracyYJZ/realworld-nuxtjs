@@ -2,7 +2,7 @@
   <div class="home-page">
     <div class="banner">
       <div class="container">
-        <h1 class="logo-font">conduit</h1>
+        <h1 class="logo-font">小可耐</h1>
         <p>A place to share your knowledge.</p>
       </div>
     </div>
@@ -63,12 +63,16 @@
               </li>
             </ul>
           </div>
-          
+
           <template v-if="articles.length === 0">
             <div class="article-preview">No articles are here... yet.</div>
           </template>
           <template v-else>
-            <article-preview v-for="article in articles" :key="article.slug" :article="article" />
+            <article-preview
+              v-for="article in articles"
+              :key="article.slug"
+              :article="article"
+            />
             <pagination :page="page" :total="total" />
           </template>
         </div>
@@ -101,25 +105,31 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
-import { getArticles, getYourFeedArticles, addFavorite, deleteFavorite } from '@/api/article'
-import { getTags } from '@/api/tag'
-import ArticlePreview from '@/components/article-preview'
-import Pagination from '@/components/pagination'
+import { mapState } from "vuex";
+import {
+  getArticles,
+  getYourFeedArticles,
+  addFavorite,
+  deleteFavorite,
+} from "@/api/article";
+import { getTags } from "@/api/tag";
+import ArticlePreview from "@/components/article-preview";
+import Pagination from "@/components/pagination";
 
-const limit = 20
+const limit = 20;
 
 export default {
-  name: 'HomeIndex',
+  name: "HomeIndex",
   components: {
     ArticlePreview,
     Pagination,
   },
   async asyncData({ query }) {
-    const page = Number.parseInt(query.page || 1)
-    const tab = query.tab || 'global_feed'
-    const tag = query.tag
-    const loadArticles = tab === 'your_feed' ? getYourFeedArticles : getArticles
+    const page = Number.parseInt(query.page || 1);
+    const tab = query.tab || "global_feed";
+    const tag = query.tag;
+    const loadArticles =
+      tab === "your_feed" ? getYourFeedArticles : getArticles;
     const [
       {
         data: { articles, articlesCount },
@@ -135,7 +145,7 @@ export default {
       }),
       getTags(),
     ])
-    const total = Math.ceil(articlesCount / limit)
+    const total = Math.ceil(articlesCount / limit);
     return {
       total, // 总页数
       page, // 页号
@@ -143,13 +153,13 @@ export default {
       tags, // 标签列表
       tab, // 选项卡
       tag, // 标签
-    }
+    };
   },
   computed: {
-    ...mapState(['user']),
+    ...mapState(["user"]),
   },
-  watchQuery: ['page', 'tag', 'tab'], // 监听 query 变化调用asyncData
-}
+  watchQuery: ["page", "tag", "tab"], // 监听 query 变化调用asyncData
+};
 </script>
 
 <style></style>
